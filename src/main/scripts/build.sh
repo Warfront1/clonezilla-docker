@@ -53,7 +53,8 @@ then
     }
 fi
 
-mount -o loop $FILE $MNT_DIR
+rm -rf $MNT_DIR
+7z x -o$MNT_DIR $FILE
 #find . -type f -name filesystem.squashfs -print0 | xargs -r0 unsquashfs -f -d "${UNSQUASH_DIR}/" -ig -no-exit
 find . -type f -name filesystem.squashfs -print0 | xargs -r0 unsquashfs -f -d "${UNSQUASH_DIR}/"
 pwd
