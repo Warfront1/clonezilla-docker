@@ -32,7 +32,7 @@ cd $BUILD_DIR
 pwd
 
 if [ ! -f "$FILE" ]; then
-    wget -O ${FILE} ${URL}
+    wget -nv -O ${FILE} ${URL}
 else
     echo "File ${FILE} already exists."
 fi
