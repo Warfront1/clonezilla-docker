@@ -1,0 +1,5 @@
+# JetBrains Personal IDE files
+.idea
+build/*
+/do_not_share_client_credentials/*
+

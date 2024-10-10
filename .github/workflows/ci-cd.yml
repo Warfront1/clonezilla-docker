@@ -1,0 +1,20 @@
+name: clonezilla-docker CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: bp1
+        name: Build clonezilla-docker
+        run: |
+          TMPDIR=$(mktemp -d)
+          URL="https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.1.3-16/clonezilla-live-3.1.3-16-amd64.iso"
+          ./build-clonezilla.sh --dir=${TMPDIR} --url=${URL} --latest
