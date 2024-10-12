@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOCKER_REPO: warfront1cz/clonezilla
+  URL: https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.1.3-16/clonezilla-live-3.1.3-16-amd64.iso
+  UPLOAD_LATEST: true
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-24.04
@@ -15,8 +20,6 @@ jobs:
       - name: Build Docker Container
         run: |
           TMPDIR=$(mktemp -d)
-          URL="https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.1.3-16/clonezilla-live-3.1.3-16-amd64.iso"
-          DOCKER_REPO="warfront1cz/clonezilla"
           sudo ./src/main/scripts/build.sh --dir=${TMPDIR} --url=${URL} --docker-repo=${DOCKER_REPO}
 
       - name: Log in to Docker Hub
@@ -27,10 +30,8 @@ jobs:
 
       - name: Publish Docker Container
         run: |
-          DOCKER_REPO="warfront1cz/clonezilla"
-          upload_latest=true
           for image in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep '${DOCKER_REPO}'); do 
-            if [[ "$image" == *":latest" && "$upload_latest" = false ]]; then
+            if [[ "$image" == *":latest" && "${UPLOAD_LATEST}" = false ]]; then
               continue
             fi
             docker push $image
