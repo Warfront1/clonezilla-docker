@@ -7,6 +7,7 @@ FILE="clonezilla.iso"
 URL="https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.1.3-16/clonezilla-live-3.1.3-16-amd64.iso"
 MNT_DIR="rootfs"
 UNSQUASH_DIR="unsquashfs"
+DOCKER_REPO="warfront1/clonezilla"
 
 for arg in "$@"
 do
@@ -17,6 +18,10 @@ do
   ;;
   --url=*)
   URL="${arg#*=}"
+  shift
+  ;;
+  --docker-repo=*)
+  DOCKER_REPO="${arg#*=}"
   shift
   ;;
  esac
@@ -55,24 +60,20 @@ fi
 
 rm -rf $MNT_DIR
 7z x -o$MNT_DIR $FILE
-#find . -type f -name filesystem.squashfs -print0 | xargs -r0 unsquashfs -f -d "${UNSQUASH_DIR}/" -ig -no-exit
 find . -type f -name filesystem.squashfs -print0 | xargs -r0 unsquashfs -f -d "${UNSQUASH_DIR}/"
 pwd
-IMAGE_ID=$(tar -C "${UNSQUASH_DIR}" -c . | docker import - warfront1/clonezilla)
+IMAGE_ID=$(tar -C "${UNSQUASH_DIR}" -c . | docker import - ${DOCKER_REPO})
 
 sleep 5s
 DOCKERFILE_PATH="./Dockerfile-tmp"
-# Create temporary Dockerfile
-echo "FROM warfront1/clonezilla:latest" > $DOCKERFILE_PATH
+echo "FROM ${DOCKER_REPO}:latest" > $DOCKERFILE_PATH
 echo "LABEL version=\"${VERSION}\"" >> $DOCKERFILE_PATH
 
-# Build Docker image from Dockerfile and set the tag
-docker build --file $DOCKERFILE_PATH --tag warfront1/clonezilla:${VERSION} .
+docker build --file $DOCKERFILE_PATH --tag ${DOCKER_REPO}:${VERSION} .
 
-# We can remove this Dockerfile after using it
 rm $DOCKERFILE_PATH
 
 echo "Clonezilla Docker image version $VERSION has been created"
 
-docker tag warfront1/clonezilla:${VERSION} warfront1/clonezilla:latest
+docker tag ${DOCKER_REPO}:${VERSION} ${DOCKER_REPO}:latest
 echo "Clonezilla Docker image additionally tagged as latest"
