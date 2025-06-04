@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_REPO: ${{ vars.DOCKER_USERNAME }}/clonezilla
-  URL: https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.2.1-9/clonezilla-live-3.2.1-9-amd64.iso
+  URL: https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.2.1-28/clonezilla-live-3.2.1-28-amd64.iso
   UPLOAD_LATEST: true
 
 jobs:
