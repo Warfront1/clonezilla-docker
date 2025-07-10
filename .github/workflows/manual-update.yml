@@ -1,0 +1,35 @@
+name: Manual Clonezilla Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'The URL of the Clonezilla ISO to update to'
+        required: true
+
+jobs:
+  update_and_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse Version from URL
+        id: parse_version
+        run: |
+          VERSION=$(basename "${{ github.event.inputs.url }}" | sed -e 's/clonezilla-live-//' -e 's/-amd64.iso//')
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update ci-cd.yml
+        run: |
+          sed -i 's|  URL:.*|  URL: ${{ github.event.inputs.url }}|' .github/workflows/ci-cd.yml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update Clonezilla to ${{ steps.parse_version.outputs.VERSION }}"
+          title: "Update to Clonezilla ${{ steps.parse_version.outputs.VERSION }}"
+          body: "This PR updates the Clonezilla version to `${{ steps.parse_version.outputs.VERSION }}`."
+          branch: "feat/clonezilla-${{ steps.parse_version.outputs.VERSION }}"
+          base: main
