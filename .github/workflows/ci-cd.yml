@@ -15,9 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Read config from clonezilla.env
+      - name: Read config from build.env
         run: |
-          cat clonezilla.env >> $GITHUB_ENV
+          cat build.env >> $GITHUB_ENV
 
       - name: Build Docker Container
         run: |

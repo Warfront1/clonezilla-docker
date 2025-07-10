@@ -22,7 +22,7 @@ jobs:
 
       - name: Update configuration file
         run: |
-          sed -i 's|^URL=.*|URL=${{ github.event.inputs.url }}|' clonezilla.env
+          sed -i 's|^URL=.*|URL=${{ github.event.inputs.url }}|' build.env
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -33,6 +33,6 @@ jobs:
           body: |
             This PR updates the Clonezilla version to `${{ steps.parse_version.outputs.VERSION }}`.
             
-            The `clonezilla.env` configuration file has been updated.
+            The `build.env` configuration file has been updated.
           branch: "feat/clonezilla-${{ steps.parse_version.outputs.VERSION }}"
           base: main
