@@ -20,9 +20,9 @@ jobs:
           VERSION=$(basename "${{ github.event.inputs.url }}" | sed -e 's/clonezilla-live-//' -e 's/-amd64.iso//')
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Update ci-cd.yml
+      - name: Update configuration file
         run: |
-          sed -i 's|  URL:.*|  URL: ${{ github.event.inputs.url }}|' .github/workflows/ci-cd.yml
+          sed -i 's|^URL=.*|URL=${{ github.event.inputs.url }}|' build.env
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -30,6 +30,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update Clonezilla to ${{ steps.parse_version.outputs.VERSION }}"
           title: "Update to Clonezilla ${{ steps.parse_version.outputs.VERSION }}"
-          body: "This PR updates the Clonezilla version to `${{ steps.parse_version.outputs.VERSION }}`."
+          body: |
+            This PR updates the Clonezilla version to `${{ steps.parse_version.outputs.VERSION }}`.
+            
+            The `build.env` configuration file has been updated.
           branch: "feat/clonezilla-${{ steps.parse_version.outputs.VERSION }}"
           base: main
