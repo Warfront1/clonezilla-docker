@@ -8,8 +8,6 @@ on:
 
 env:
   DOCKER_REPO: ${{ vars.DOCKER_USERNAME }}/clonezilla
-  URL: https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.2.1-28/clonezilla-live-3.2.1-28-amd64.iso
-  UPLOAD_LATEST: true
 
 jobs:
   build_and_deploy:
@@ -17,10 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Read config from clonezilla.env
+        run: |
+          cat clonezilla.env >> $GITHUB_ENV
+
       - name: Build Docker Container
         run: |
           TMPDIR=$(mktemp -d)
-          sudo ./src/main/scripts/build.sh --dir=${TMPDIR} --url=${URL} --docker-repo=${DOCKER_REPO}
+          sudo ./src/main/scripts/build.sh --dir=${TMPDIR} --url=${{ env.URL }} --docker-repo=${DOCKER_REPO}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -32,6 +34,6 @@ jobs:
         shell: bash
         run: |
           docker images
-          [ "${UPLOAD_LATEST}" = false ] && docker rmi ${DOCKER_REPO}:latest
+          [ "${{ env.UPLOAD_LATEST }}" = false ] && docker rmi ${DOCKER_REPO}:latest
           docker push ${DOCKER_REPO} --all-tags
         if: github.ref == 'refs/heads/main'
